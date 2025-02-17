@@ -1,0 +1,140 @@
+root@DyvoPes ~$ snap install lxd
+snap "lxd" is already installed, see 'snap help refresh'
+
+root@DyvoPes ~$ snap list lxd
+Name  Version        Rev    Tracking      Publisher   Notes
+lxd   5.0.4-497fe1e  31333  5.0/stable/…  canonical✓  -
+root@DyvoPes ~$ systemctl status snap.lxd.daemon
+○ snap.lxd.daemon.service - Service for snap application lxd.daemon
+     Loaded: loaded (/etc/systemd/system/snap.lxd.daemon.service; static)
+     Active: inactive (dead)
+TriggeredBy: ● snap.lxd.daemon.unix.socket
+
+root@DyvoPes ~$ lxc list
+If this is your first time running LXD on this machine, you should also run: lxd init
+To start your first container, try: lxc launch ubuntu:22.04
+Or for a virtual machine: lxc launch ubuntu:22.04 --vm
+
++------+-------+------+------+------+-----------+
+| NAME | STATE | IPV4 | IPV6 | TYPE | SNAPSHOTS |
++------+-------+------+------+------+-----------+
+
+root@DyvoPes ~$ lxd init
+Would you like to use LXD clustering? (yes/no) [default=no]: yes
+What IP address or DNS name should be used to reach this server? [default=66.85.133.174]: 
+Are you joining an existing cluster? (yes/no) [default=no]: 
+What member name should be used to identify this server in the cluster? [default=DyvoPes]: 
+Do you want to configure a new local storage pool? (yes/no) [default=yes]: 
+Name of the storage backend to use (lvm, zfs, btrfs, dir) [default=zfs]: 
+Create a new ZFS pool? (yes/no) [default=yes]: 
+Would you like to use an existing empty block device (e.g. a disk or partition)? (yes/no) [default=no]: 
+Size in GiB of the new loop device (1GiB minimum) [default=30GiB]: 
+Do you want to configure a new remote storage pool? (yes/no) [default=no]: 
+Would you like to connect to a MAAS server? (yes/no) [default=no]: 
+Would you like to configure LXD to use an existing bridge or host interface? (yes/no) [default=no]: no
+Would you like to create a new Fan overlay network? (yes/no) [default=yes]: no
+Would you like stale cached images to be updated automatically? (yes/no) [default=yes]: 
+Would you like a YAML "lxd init" preseed to be printed? (yes/no) [default=no]: yes
+config:
+  core.https_address: 66.85.133.174:8443
+networks: []
+storage_pools:
+- config:
+    size: 30GiB
+  description: ""
+  name: local
+  driver: zfs
+profiles:
+- config: {}
+  description: ""
+  devices:
+    root:
+      path: /
+      pool: local
+      type: disk
+  name: default
+projects: []
+cluster:
+  server_name: DyvoPes
+  enabled: true
+  member_config: []
+  cluster_address: ""
+  cluster_certificate: ""
+  server_address: ""
+  cluster_password: ""
+  cluster_certificate_path: ""
+  cluster_token: ""
+
+Saved for automation
+
+root@DyvoPes ~$ lxc network list
++------+----------+---------+------+------+-------------+---------+-------+
+| NAME |   TYPE   | MANAGED | IPV4 | IPV6 | DESCRIPTION | USED BY | STATE |
++------+----------+---------+------+------+-------------+---------+-------+
+| eth0 | physical | NO      |      |      |             | 0       |       |
++------+----------+---------+------+------+-------------+---------+-------+
+| eth1 | physical | NO      |      |      |             | 0       |       |
++------+----------+---------+------+------+-------------+---------+-------+
+root@DyvoPes ~$ lxc network create lxdbr0
+Network lxdbr0 created
+root@DyvoPes ~$ lxc network list
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+|  NAME  |   TYPE   | MANAGED |      IPV4      |           IPV6           | DESCRIPTION | USED BY |  STATE  |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| eth0   | physical | NO      |                |                          |             | 0       |         |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| eth1   | physical | NO      |                |                          |             | 0       |         |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| lxdbr0 | bridge   | YES     | 10.249.49.1/24 | fd42:7b3e:a6d5:fce::1/64 |             | 0       | CREATED |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+root@DyvoPes ~$ lxc profile device add default eth0 nic name=eth0 network=lxdbr0
+Device eth0 added to default
+root@DyvoPes ~$ lxc network list
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+|  NAME  |   TYPE   | MANAGED |      IPV4      |           IPV6           | DESCRIPTION | USED BY |  STATE  |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| eth0   | physical | NO      |                |                          |             | 0       |         |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| eth1   | physical | NO      |                |                          |             | 0       |         |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| lxdbr0 | bridge   | YES     | 10.249.49.1/24 | fd42:7b3e:a6d5:fce::1/64 |             | 1       | CREATED |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+
+root@DyvoPes ~$ lxc network set lxdbr0 ipv4.nat true
+
+
+root@DyvoPes ~$ lxc network list
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+|  NAME  |   TYPE   | MANAGED |      IPV4      |           IPV6           | DESCRIPTION | USED BY |  STATE  |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| eth0   | physical | NO      |                |                          |             | 0       |         |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| eth1   | physical | NO      |                |                          |             | 0       |         |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+| lxdbr0 | bridge   | YES     | 10.249.49.1/24 | fd42:7b3e:a6d5:fce::1/64 |             | 1       | CREATED |
++--------+----------+---------+----------------+--------------------------+-------------+---------+---------+
+
+root@DyvoPes ~$ systemctl restart snap.lxd.daemon
+
+root@DyvoPes ~$ lxc launch ubuntu:22.04 test-container
+Creating test-container
+Starting test-container                       
+root@DyvoPes ~$ lxc list       
++----------------+---------+----------------------+----------------------------------------------+-----------+-----------+----------+
+|      NAME      |  STATE  |         IPV4         |                     IPV6                     |   TYPE    | SNAPSHOTS | LOCATION |
++----------------+---------+----------------------+----------------------------------------------+-----------+-----------+----------+
+| test-container | RUNNING | 10.249.49.103 (eth0) | fd42:7b3e:a6d5:fce:216:3eff:fe34:25f7 (eth0) | CONTAINER | 0         | DyvoPes  |
++----------------+---------+----------------------+----------------------------------------------+-----------+-----------+----------+
+root@DyvoPes ~$ lxc exec test-container -- ping -c 4 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=54 time=11.4 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=54 time=11.2 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=54 time=11.3 ms
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=54 time=11.3 ms
+
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 11.241/11.310/11.351/0.041 ms
+
+
+
