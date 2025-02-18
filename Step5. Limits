@@ -1,0 +1,51 @@
+CPU check for all containers:
+root@DyvoPes ~$ lxc list --format csv -c ns,t,u,m
+alma8testcontainer,RUNNING,CONTAINER,1s,46.62MiB
+alma8testvm,RUNNING,VIRTUAL-MACHINE,6s,231.45MiB
+guitestcontainer1,RUNNING,CONTAINER,4939s,30.05MiB
+test-container,RUNNING,CONTAINER,9s,266.33MiB
+wp-db-container,RUNNING,CONTAINER,8s,273.17MiB
+
+
+Modify each container to limit CPU, memory, and processes:
+for container in $(lxc list --format csv -c ns,t | awk -F ',' '$3=="CONTAINER" {print $1}'); do 
+  lxc config set "$container" limits.cpu 1          
+  lxc config set "$container" limits.memory 300MB    
+  lxc config set "$container" limits.processes 300  
+done
+
+root@DyvoPes ~$ lxc config show alma8testcontainer | grep limits
+  limits.cpu: "1"
+  limits.memory: 300MB
+  limits.processes: "300"
+
+
+
+Set Defaults:
+lxc profile set default limits.cpu 1
+lxc profile set default limits.memory 300MB
+lxc profile set default limits.processes 300
+
+
+For virtual machines (VMs) in LXD, resource limits work differently than for containers. I need to use limits.cpu, limits.memory, and additional settings like limits.disk when I need. 
+
+root@DyvoPes ~$ lxc config show alma8testcontainer | grep limits
+  limits.cpu: "1"
+  limits.memory: 300MB
+  limits.processes: "300"
+root@DyvoPes ~$ lxc config show alma8testvm | grep limits
+root@DyvoPes ~$ lxc config set alma8testvm limits.memory 300MB
+root@DyvoPes ~$ lxc config set alma8testvm limits.cpu 1
+root@DyvoPes ~$ lxc config show alma8testvm | grep limits
+  limits.cpu: "1"
+  limits.memory: 300MB
+root@DyvoPes ~$ lxc profile set default limits.memory 300MB
+lxc profile set default limits.cpu 1
+
+
+root@DyvoPes ~$ lxc config device override alma8testvm root
+root@DyvoPes ~$ lxc config device set alma8testvm root size 30GB
+Device root overridden for alma8testvm
+root@DyvoPes ~$ lxc config device show alma8testvm | grep size
+  size: 30GB
+ 
