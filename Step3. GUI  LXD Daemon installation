@@ -1,0 +1,19 @@
+
+root@DyvoPes ~$ git clone https://github.com/AdaptiveScale/lxdui.git
+Cloning into 'lxdui'...
+remote: Enumerating objects: 5443, done.
+remote: Counting objects: 100% (278/278), done.
+remote: Compressing objects: 100% (140/140), done.
+remote: Total 5443 (delta 170), reused 227 (delta 138), pack-reused 5165 (from 1)
+Receiving objects: 100% (5443/5443), 5.10 MiB | 16.16 MiB/s, done.
+Resolving deltas: 100% (3773/3773), done.
+
+root@DyvoPes ~$ cd lxdui
+
+root@DyvoPes ~$ python3 setup.py install
+
+root@DyvoPes lxdui$ python3 run.py start
+LXDUI ver. 2.2 -- (c)AdaptiveScale, Inc.
+http://www.adaptivescale.com
+LXDUI started. Running on http://0.0.0.0:15151
+PID=398393, Press CTRL+C to quit
