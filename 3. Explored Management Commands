@@ -1,0 +1,121 @@
+🔹 Basic LXC Container Management
+
+lxc list	List #all containers and their statuses.
+lxc launch ubuntu:22.04 my-container	#Create and start a new container.
+lxc start my-container	#Start a container.
+lxc stop my-container	#Stop a container.
+lxc restart my-container	#Restart a container.
+lxc delete my-container	#Delete a stopped container.
+
+
+🔹 Container Information & Configuration
+
+lxc info my-container	#Show detailed info about the container.
+lxc config show my-container	#Display the container’s configuration.
+lxc exec my-container -- bash	#Access the container’s shell.
+lxc file push localfile.txt my-container/root/	#Copy a file to a container.
+lxc file pull my-container/root/file.txt ./	#Copy a file from a container.
+lxc copy my-container my-container-backup	#Clone a container.
+
+
+
+🔹 Networking & Storage
+
+lxc network list	#List available networks.
+lxc network show lxdbr0	#Show details of the default bridge.
+lxc config device add my-container eth0 nic nictype=bridged parent=bridge0	#Assign a network bridge.
+lxc storage list	#List storage pools.
+lxc storage show default	#Show storage details.
+
+
+
+🔹 Snapshots & Backups
+
+lxc snapshot my-container snap1	#Take a snapshot. The snapshot is stored inside the same storage pool that the container is using.To check:
+root@DyvoPes ~$ lxc storage list
++-------+--------+-------------+---------+---------+
+| NAME  | DRIVER | DESCRIPTION | USED BY |  STATE  |
++-------+--------+-------------+---------+---------+
+| local | zfs    |             | 5       | CREATED |
++-------+--------+-------------+---------+---------+
+root@DyvoPes ~$ lxc info test-container
+Name: test-container
+Status: RUNNING
+Type: container
+Architecture: x86_64
+Location: DyvoPes
+PID: 250415
+Created: 2025/02/17 12:49 UTC
+Last Used: 2025/02/17 12:49 UTC
+
+Resources:
+  Processes: 68
+  Disk usage:
+    root: 250.32MiB
+  CPU usage:
+    CPU usage (in seconds): 133
+  Memory usage:
+    Memory (current): 426.15MiB
+  Network usage:
+    eth0:
+      Type: broadcast
+      State: UP
+      Host interface: vetha87afdf7
+      MAC address: 00:16:3e:34:25:f7
+      MTU: 1500
+      Bytes received: 159.96MB
+      Bytes sent: 5.42MB
+      Packets received: 25070
+      Packets sent: 23878
+      IP addresses:
+        inet:  10.249.49.103/24 (global)
+        inet6: fd42:7b3e:a6d5:fce:216:3eff:fe34:25f7/64 (global)
+        inet6: fe80::216:3eff:fe34:25f7/64 (link)
+    lo:
+      Type: loopback
+      State: UP
+      MTU: 65536
+      Bytes received: 9.59MB
+      Bytes sent: 9.59MB
+      Packets received: 6182
+      Packets sent: 6182
+      IP addresses:
+        inet:  127.0.0.1/8 (local)
+        inet6: ::1/128 (local)
+
+Snapshots:
++-------+----------------------+------------+----------+
+| NAME  |       TAKEN AT       | EXPIRES AT | STATEFUL |
++-------+----------------------+------------+----------+
+| snap1 | 2025/02/18 10:09 UTC |            | NO       |
++-------+----------------------+------------+----------+
+
+
+lxc restore my-container snap1	#Restore from a snapshot.
+lxc delete my-container/snap1	#Delete a snapshot.
+lxc export my-container backup.tar.gz	#Export a container to a tarball.
+lxc import backup.tar.gz my-container-restored	#Restore a container from a backup.
+
+
+
+🔹 User & Process Management
+
+lxc exec my-container -- whoami	#Check the current user inside the container.
+lxc exec my-container -- ps aux	#View running processes inside the container.
+lxc exec my-container -- systemctl status apache2	#Check service status inside the container.
+
+
+
+🔹 Device & Resource Management
+
+lxc config set my-container limits.cpu 2	#Limit CPU usage to 2 cores.
+lxc config set my-container limits.memory 2GB	#Limit memory to 2GB.
+lxc config device add my-container myport80 proxy listen=tcp:0.0.0.0:80 connect=tcp:127.0.0.1:80	#Forward port 80 from host to container.
+lxc config device remove my-container myport80	#Remove port forwarding.
+
+
+🔹 Cluster Management
+Command	Description
+lxc cluster list	#List all nodes in a cluster.
+lxc cluster show my-cluster	#Show cluster details.
+lxc cluster remove my-node	#Remove a node from the cluster.
