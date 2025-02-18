@@ -1,0 +1,81 @@
+1. Enable AppArmor
+root@DyvoPes ~$ aa-status
+apparmor module is loaded.
+171 profiles are loaded.
+171 profiles are in enforce mode.
+
+
+root@DyvoPes ~$ aa-status | grep lxc
+   :lxd-guitestcontainer1_<var-snap-lxd-common-lxd>:snap.lxd.lxc
+   :lxd-guitestcontainer1_<var-snap-lxd-common-lxd>:snap.lxd.lxc-to-lxd
+   :lxd-test-container_<var-snap-lxd-common-lxd>:snap.lxd.lxc
+   :lxd-test-container_<var-snap-lxd-common-lxd>:snap.lxd.lxc-to-lxd
+   :lxd-wp-db-container_<var-snap-lxd-common-lxd>:snap.lxd.lxc
+   :lxd-wp-db-container_<var-snap-lxd-common-lxd>:snap.lxd.lxc-to-lxd
+   snap.lxd.lxc
+   snap.lxd.lxc-to-lxd
+_______________________________________________________________________________________________________________________________-   
+2. Use Seccomp to Restrict Syscalls:
+
+root@DyvoPes ~$ lxc list --format csv -c ns,t
+alma8testcontainer,RUNNING,CONTAINER
+alma8testvm,RUNNING,VIRTUAL-MACHINE
+guitestcontainer1,RUNNING,CONTAINER
+test-container,RUNNING,CONTAINER
+wp-db-container,RUNNING,CONTAINER
+
+root@DyvoPes ~$ for container in $(lxc list --format csv -c ns,t | awk -F ',' '$3=="CONTAINER" {print $1}'); do 
+  lxc config unset "$container" security.syscalls.blacklist
+  lxc config set "$container" security.nesting false
+  lxc config set "$container" security.syscalls.deny "keyctl chown mknod"
+done
+root@DyvoPes ~$ lxc config show test-container | grep security
+  security.nesting: "false"
+  security.syscalls.deny: keyctl chown mknod
+root@DyvoPes ~$ for container in $(lxc list --format csv -c ns,t | awk -F ',' '$3=="CONTAINER" {print $1}'); do
+  echo "Checking $container..."
+  lxc config show "$container" | grep security
+  echo "-------------------"
+done
+Checking alma8testcontainer...
+  security.nesting: "false"
+  security.syscalls.deny: keyctl chown mknod
+-------------------
+Checking guitestcontainer1...
+  security.nesting: "false"
+  security.syscalls.deny: keyctl chown mknod
+-------------------
+Checking test-container...
+  security.nesting: "false"
+  security.syscalls.deny: keyctl chown mknod
+-------------------
+Checking wp-db-container...
+  security.nesting: "false"
+  security.syscalls.deny: keyctl chown mknod
+  
+  
+root@DyvoPes ~$ lxc profile set default security.nesting false
+root@DyvoPes ~$ lxc profile set default security.syscalls.blacklist "keyctl chown mknod"
+  
+
+
+The security.nesting setting in LXC controls whether a container can run nested containers or virtualization features inside it.
+When security.nesting: true (Enabled)
+
+    The container can create and manage other containers (LXC, Docker, Kubernetes, etc.).
+    Required if you want to run Docker inside an LXC container.
+    Useful for CI/CD environments where you need nested virtualization.
+
+ When security.nesting: false (Disabled) – Default & More Secure
+
+    The container cannot run nested containers or certain virtualization features.
+    Prevents potential security risks from running untrusted workloads inside the container.
+    Recommended for security-focused deployments, where the container should not manage other containers.
+
+When To Enable: 
+
+    If you need Docker, Kubernetes, or another container engine inside LXC → Set true
+    If you want better security and isolation → Set false
+
+Since you set security.nesting: false, your containers cannot run other containers inside them,   
+__________________________________________________________________________________________________________________   
