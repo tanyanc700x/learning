@@ -172,3 +172,21 @@ OR http://66.85.133.174/ Apache2 Default Page It works!
 
 lxc stop test-container
 
+
+Also, a file/directory can be uploaded or downloaded to and from a container. 
+
+To pull a file or directory from your host machine to an LXC container:
+1. Check the file existence: root@DyvoPes ~$ lxc exec test-container -- ls -l /root/testfile.txt
+2. Pull the file:            root@DyvoPes ~$ lxc file pull test-container/root/testfile.txt /lxc/
+3. Pull a directory:      root@DyvoPes ~$ lxc file pull -r test-container/root/mydirectory /lxc/
+
+
+To push a file or directory from your host machine to an LXC container:
+1. Push a file:             root@DyvoPes ~$ lxc file push /lxc/testfile.txt test-container/root/
+2. Push a directory:        root@DyvoPes ~$ lxc file push -r /lxc/mydirectory test-container/root/
+
+
+
+
+
+
