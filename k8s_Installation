@@ -1,0 +1,385 @@
+Kubernetis Project with Minicube
+
+Installing Docker:
+
+root@DyvoPes ~$  curl -o get-docker.sh https://get.docker.com
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 22592  100 22592    0     0   186k      0 --:--:-- --:--:-- --:--:--  186k
+
+
+root@DyvoPes ~$  sh get-docker.sh
+# Executing docker install script, commit: 4c94a56999e10efcf48c5b8e3f6afea464f9108e
++ sh -c apt-get -qq update >/dev/null
++ sh -c DEBIAN_FRONTEND=noninteractive apt-get -y -qq install ca-certificates curl >/dev/null
++ sh -c install -m 0755 -d /etc/apt/keyrings
++ sh -c curl -fsSL "https://download.docker.com/linux/ubuntu/gpg" -o /etc/apt/keyrings/docker.asc
++ sh -c chmod a+r /etc/apt/keyrings/docker.asc
++ sh -c echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list
++ sh -c apt-get -qq update >/dev/null
++ sh -c DEBIAN_FRONTEND=noninteractive apt-get -y -qq install docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-ce-rootless-extras docker-buildx-plugin >/dev/null
+Scanning processes...                                                                                                                                                         
+Scanning processor microcode...                                                                                                                                               
+Scanning linux images...                                                                                                                                                      
++ sh -c docker version
+Client: Docker Engine - Community
+ Version:           28.0.1
+ API version:       1.48
+ Go version:        go1.23.6
+ Git commit:        068a01e
+ Built:             Wed Feb 26 10:41:12 2025
+ OS/Arch:           linux/amd64
+ Context:           default
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          28.0.1
+  API version:      1.48 (minimum version 1.24)
+  Go version:       go1.23.6
+  Git commit:       bbd0a17
+  Built:            Wed Feb 26 10:41:12 2025
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.7.25
+  GitCommit:        bcc810d6b9066471b0b6fa75f557a15a1cbf31bb
+ runc:
+  Version:          1.2.4
+  GitCommit:        v1.2.4-0-g6c52b3f
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+
+================================================================================
+
+To run Docker as a non-privileged user, consider setting up the
+Docker daemon in rootless mode for your user:
+
+    dockerd-rootless-setuptool.sh install
+
+Visit https://docs.docker.com/go/rootless/ to learn about rootless mode.
+
+
+To run the Docker daemon as a fully privileged service, but granting non-root
+users access, refer to https://docs.docker.com/go/daemon-access/
+
+WARNING: Access to the remote API on a privileged Docker daemon is equivalent
+         to root access on the host. Refer to the 'Docker daemon attack surface'
+         documentation for details: https://docs.docker.com/go/attack-surface/
+
+================================================================================
+
+root@DyvoPes ~$  docker run hello-world
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+e6590344b1a5: Pull complete 
+Digest: sha256:bfbb0cc14f13f9ed1ae86abc2b9f11181dc50d779807ed3a3c5e55a6936dbdd5
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+
+
+root@DyvoPes ~$  usermod -aG docker $USER
+____________________________________________________________________________________________________--
+
+Installing kubectl
+VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+
+v1.32.2root@DyvoPes ~$  os=linux
+root@DyvoPes ~$  uname -m
+x86_64
+root@DyvoPes ~$  arch=amd64
+root@DyvoPes ~$  echo $archecho "version: $version"
+amd64
+root@DyvoPes ~$  curl -L -o /usr/local/bin/kubectl "https://dl.k8s.io/release/$version/bin/$os/$arch/kubectl"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   138  100   138    0     0   1288      0 --:--:-- --:--:-- --:--:--  1301
+100   234  100   234    0     0    734      0 --:--:-- --:--:-- --:--:--   734
+
+
+root@DyvoPes ~$  chmod +x /usr/local/bin/kubectl
+
+
+
+root@DyvoPes ~$  echo "version: $VERSION"
+VERSION: 
+root@DyvoPes ~$  echo "OS: $OS"
+OS: 
+root@DyvoPes ~$  echo "ARCH: $ARCH"
+root@DyvoPes ~$  curl -L -o /usr/local/bin/kubectl "https://dl.k8s.io/release/$version/bin/$os/$arch/kubectl"
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   138  100   138    0     0   1282      0 --:--:-- --:--:-- --:--:--  1289
+100 54.6M  100 54.6M    0     0  72.8M      0 --:--:-- --:--:-- --:--:-- 72.8M
+root@DyvoPes ~$  chmod +x /usr/local/bin/kubectl
+root@DyvoPes ~$  kubectl version --client
+Client Version: v1.32.2
+Kustomize Version: v5.5.0
+
+
+
+root@DyvoPes ~$  curl -L -o /usr/local/minikube https://github.com/kubernetes/minikube/releases/download/v1.35.0/minikube-linux-amd64
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  119M  100  119M    0     0  67.4M      0  0:00:01  0:00:01 --:--:--  103M
+root@DyvoPes ~$  chmod +x /usr/local/minikube
+root@DyvoPes ~$  rm /usr/local/minikube
+root@DyvoPes ~$  curl -L -o /usr/local/bin/minikube https://github.com/kubernetes/minikube/releases/download/v1.35.0/minikube-linux-amd64
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  119M  100  119M    0     0  67.4M      0  0:00:01  0:00:01 --:--:-- 80.7M
+root@DyvoPes ~$  chmod +x /usr/local/bin/minikube
+
+root@DyvoPes ~$  minikube version 
+minikube version: v1.35.0
+commit: dd5d320e41b5451cdf3c01891bc4e13d189586ed-dirty
+
+
+__________________________________________________________________________
+
+
+Creating a single-node Kubernetes cluster with minikube
+
+root@DyvoPes ~$  minikube start --cni=calico --force
+😄  minikube v1.35.0 on Ubuntu 24.04
+❗  minikube skips various validations when --force is supplied; this may lead to unexpected behavior
+✨  Automatically selected the docker driver. Other choices: none, ssh
+🛑  The "docker" driver should not be used with root privileges. If you wish to continue as root, use --force.
+💡  If you are running minikube within a VM, consider using --driver=none:
+📘    https://minikube.sigs.k8s.io/docs/reference/drivers/none/
+📌  Using Docker driver with root privileges
+👍  Starting "minikube" primary control-plane node in "minikube" cluster
+🚜  Pulling base image v0.0.46 ...
+💾  Downloading Kubernetes v1.32.0 preload ...
+    > preloaded-images-k8s-v18-v1...:  333.57 MiB / 333.57 MiB  100.00% 77.43 M
+    > gcr.io/k8s-minikube/kicbase...:  500.31 MiB / 500.31 MiB  100.00% 45.05 M
+🔥  Creating docker container (CPUs=2, Memory=3900MB) ...
+🐳  Preparing Kubernetes v1.32.0 on Docker 27.4.1 ...
+    ▪ Generating certificates and keys ...
+    ▪ Booting up control plane ...
+    ▪ Configuring RBAC rules ...
+🔗  Configuring Calico (Container Networking Interface) ...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+🔎  Verifying Kubernetes components...
+🌟  Enabled addons: default-storageclass, storage-provisioner
+🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
+_____________________________________________________________________________
+
+Smoke testing the cluster
+
+root@DyvoPes ~$  kubectl run --rm --stdin --image=hello-world --restart=Never --request-timeout=30 testpod
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+pod "testpod" deleted
+___________________________________________________________________________________
+
+root@DyvoPes ~$  kubectl config get-clusters
+NAME
+minikube
+root@DyvoPes ~$  kubectl config current-context
+minikube
+root@DyvoPes ~$  minikube status
+minikube
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+
+_______________________________________
+
+
+root@DyvoPes ~$  minikube node add
+😄  Adding node m02 to cluster minikube as [worker]
+❗  Cluster was created without any CNI, adding a node to it might cause broken networking.
+👍  Starting "minikube-m02" worker node in "minikube" cluster
+🚜  Pulling base image v0.0.46 ...
+🔥  Creating docker container (CPUs=2, Memory=2200MB) ...
+🐳  Preparing Kubernetes v1.32.0 on Docker 27.4.1 ...
+🔎  Verifying Kubernetes components...
+🏄  Successfully added m02 to minikube!
+______________________________________________
+
+
+root@DyvoPes ~$  kubectl get pods -n kube-system
+NAME                                       READY   STATUS    RESTARTS      AGE
+calico-kube-controllers-5745477d4d-j6gw2   1/1     Running   3 (10m ago)   10m
+calico-node-79p4z                          1/1     Running   0             10m
+calico-node-j7x8d                          1/1     Running   0             3m9s
+coredns-668d6bf9bc-2gpth                   1/1     Running   2 (10m ago)   10m
+etcd-minikube                              1/1     Running   0             10m
+kube-apiserver-minikube                    1/1     Running   0             10m
+kube-controller-manager-minikube           1/1     Running   0             10m
+kube-proxy-6wm8k                           1/1     Running   0             10m
+kube-proxy-9gzsn                           1/1     Running   0             3m9s
+kube-scheduler-minikube                    1/1     Running   0             10m
+storage-provisioner                        1/1     Running   0             10m
+root@DyvoPes ~$  
+
+_____________________________________________________________________________________
+
+
+To get to dashboard:
+root@DyvoPes ~$  minikube addons list
+|-----------------------------|----------|--------------|--------------------------------|
+|         ADDON NAME          | PROFILE  |    STATUS    |           MAINTAINER           |
+|-----------------------------|----------|--------------|--------------------------------|
+| ambassador                  | minikube | disabled     | 3rd party (Ambassador)         |
+| amd-gpu-device-plugin       | minikube | disabled     | 3rd party (AMD)                |
+| auto-pause                  | minikube | disabled     | minikube                       |
+| cloud-spanner               | minikube | disabled     | Google                         |
+| csi-hostpath-driver         | minikube | disabled     | Kubernetes                     |
+| dashboard                   | minikube | disabled     | Kubernetes                     |
+| default-storageclass        | minikube | disabled     | Kubernetes                     |
+| efk                         | minikube | disabled     | 3rd party (Elastic)            |
+| freshpod                    | minikube | disabled     | Google                         |
+| gcp-auth                    | minikube | disabled     | Google                         |
+| gvisor                      | minikube | disabled     | minikube                       |
+| headlamp                    | minikube | disabled     | 3rd party (kinvolk.io)         |
+| inaccel                     | minikube | disabled     | 3rd party (InAccel             |
+|                             |          |              | [info@inaccel.com])            |
+| ingress                     | minikube | disabled     | Kubernetes                     |
+| ingress-dns                 | minikube | disabled     | minikube                       |
+| inspektor-gadget            | minikube | disabled     | 3rd party                      |
+|                             |          |              | (inspektor-gadget.io)          |
+| istio                       | minikube | disabled     | 3rd party (Istio)              |
+| istio-provisioner           | minikube | disabled     | 3rd party (Istio)              |
+| kong                        | minikube | disabled     | 3rd party (Kong HQ)            |
+| kubeflow                    | minikube | disabled     | 3rd party                      |
+| kubevirt                    | minikube | disabled     | 3rd party (KubeVirt)           |
+| logviewer                   | minikube | disabled     | 3rd party (unknown)            |
+| metallb                     | minikube | disabled     | 3rd party (MetalLB)            |
+| metrics-server              | minikube | disabled     | Kubernetes                     |
+| nvidia-device-plugin        | minikube | disabled     | 3rd party (NVIDIA)             |
+| nvidia-driver-installer     | minikube | disabled     | 3rd party (NVIDIA)             |
+| nvidia-gpu-device-plugin    | minikube | disabled     | 3rd party (NVIDIA)             |
+| olm                         | minikube | disabled     | 3rd party (Operator Framework) |
+| pod-security-policy         | minikube | disabled     | 3rd party (unknown)            |
+| portainer                   | minikube | disabled     | 3rd party (Portainer.io)       |
+| registry                    | minikube | disabled     | minikube                       |
+| registry-aliases            | minikube | disabled     | 3rd party (unknown)            |
+| registry-creds              | minikube | disabled     | 3rd party (UPMC Enterprises)   |
+| storage-provisioner         | minikube | disabled     | minikube                       |
+| storage-provisioner-gluster | minikube | disabled     | 3rd party (Gluster)            |
+| storage-provisioner-rancher | minikube | disabled     | 3rd party (Rancher)            |
+| volcano                     | minikube | disabled     | third-party (volcano)          |
+| volumesnapshots             | minikube | disabled     | Kubernetes                     |
+| yakd                        | minikube | disabled     | 3rd party (marcnuri.com)       |
+|-----------------------------|----------|--------------|--------------------------------|
+root@DyvoPes ~$  
+root@DyvoPes ~$  minikube addons enable metrics-server
+💡  metrics-server is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+    ▪ Using image registry.k8s.io/metrics-server/metrics-server:v0.7.2
+🌟  The 'metrics-server' addon is enabled
+root@DyvoPes ~$  minikube addons enable dashboard
+💡  dashboard is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+    ▪ Using image docker.io/kubernetesui/dashboard:v2.7.0
+    ▪ Using image docker.io/kubernetesui/metrics-scraper:v1.0.8
+💡  Some dashboard features require the metrics-server addon. To enable all features please run:
+
+	minikube addons enable metrics-server
+
+🌟  The 'dashboard' addon is enabled
+root@DyvoPes ~$  minikube addons list
+|-----------------------------|----------|--------------|--------------------------------|
+|         ADDON NAME          | PROFILE  |    STATUS    |           MAINTAINER           |
+|-----------------------------|----------|--------------|--------------------------------|
+| ambassador                  | minikube | disabled     | 3rd party (Ambassador)         |
+| amd-gpu-device-plugin       | minikube | disabled     | 3rd party (AMD)                |
+| auto-pause                  | minikube | disabled     | minikube                       |
+| cloud-spanner               | minikube | disabled     | Google                         |
+| csi-hostpath-driver         | minikube | disabled     | Kubernetes                     |
+| dashboard                   | minikube | enabled ✅   | Kubernetes                     |
+| default-storageclass        | minikube | disabled     | Kubernetes                     |
+| efk                         | minikube | disabled     | 3rd party (Elastic)            |
+| freshpod                    | minikube | disabled     | Google                         |
+| gcp-auth                    | minikube | disabled     | Google                         |
+| gvisor                      | minikube | disabled     | minikube                       |
+| headlamp                    | minikube | disabled     | 3rd party (kinvolk.io)         |
+| inaccel                     | minikube | disabled     | 3rd party (InAccel             |
+|                             |          |              | [info@inaccel.com])            |
+| ingress                     | minikube | disabled     | Kubernetes                     |
+| ingress-dns                 | minikube | disabled     | minikube                       |
+| inspektor-gadget            | minikube | disabled     | 3rd party                      |
+|                             |          |              | (inspektor-gadget.io)          |
+| istio                       | minikube | disabled     | 3rd party (Istio)              |
+| istio-provisioner           | minikube | disabled     | 3rd party (Istio)              |
+| kong                        | minikube | disabled     | 3rd party (Kong HQ)            |
+| kubeflow                    | minikube | disabled     | 3rd party                      |
+| kubevirt                    | minikube | disabled     | 3rd party (KubeVirt)           |
+| logviewer                   | minikube | disabled     | 3rd party (unknown)            |
+| metallb                     | minikube | disabled     | 3rd party (MetalLB)            |
+| metrics-server              | minikube | enabled ✅   | Kubernetes                     |
+| nvidia-device-plugin        | minikube | disabled     | 3rd party (NVIDIA)             |
+| nvidia-driver-installer     | minikube | disabled     | 3rd party (NVIDIA)             |
+| nvidia-gpu-device-plugin    | minikube | disabled     | 3rd party (NVIDIA)             |
+| olm                         | minikube | disabled     | 3rd party (Operator Framework) |
+| pod-security-policy         | minikube | disabled     | 3rd party (unknown)            |
+| portainer                   | minikube | disabled     | 3rd party (Portainer.io)       |
+| registry                    | minikube | disabled     | minikube                       |
+| registry-aliases            | minikube | disabled     | 3rd party (unknown)            |
+| registry-creds              | minikube | disabled     | 3rd party (UPMC Enterprises)   |
+| storage-provisioner         | minikube | disabled     | minikube                       |
+| storage-provisioner-gluster | minikube | disabled     | 3rd party (Gluster)            |
+| storage-provisioner-rancher | minikube | disabled     | 3rd party (Rancher)            |
+| volcano                     | minikube | disabled     | third-party (volcano)          |
+| volumesnapshots             | minikube | disabled     | Kubernetes                     |
+| yakd                        | minikube | disabled     | 3rd party (marcnuri.com)       |
+|-----------------------------|----------|--------------|--------------------------------|
+root@DyvoPes ~$  minikube dashboard
+🤔  Verifying dashboard health ...
+🚀  Launching proxy ...
+🤔  Verifying proxy health ...
+http://127.0.0.1:46525/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
+
+
+
+THE LINK DOD NOT WORK CAUSE OF DEDIC SERVER, HAD TO DO PORT FORWARDING TO LOCAL MACHINE 
+
+tanya@DyvoPes:~$ ssh -L 8001:127.0.0.1:46525 root@66.85.133.174
