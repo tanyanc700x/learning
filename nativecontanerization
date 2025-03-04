@@ -1,0 +1,209 @@
+__________________________________________________________________________________
+On Dedicated server:
+debootstrap --arch=amd64 jammy /var/lib/machines/jammy1
+__________________________________________________________________________________
+
+debootstrap --arch=amd64 --include=systemd,dbus jammy /var/lib/machines/jammy1
+__________________________________________________________________________________
+root@dedic-DyvoPes:/var/lib/machines$ ll jammy1
+total 72
+drwxr-xr-x 18 root root 4096 Sep 20 09:52 ./
+drwx------  4 root root 4096 Sep 20 09:52 ../
+lrwxrwxrwx  1 root root    7 Sep 20 09:18 bin -> usr/bin/
+drwxr-xr-x  2 root root 4096 Apr 18  2022 boot/
+drwxr-xr-x  2 root root 4096 Sep 20 09:52 debootstrap/
+drwxr-xr-x  4 root root 4096 Sep 20 09:18 dev/
+drwxr-xr-x 61 root root 4096 Sep 20 09:34 etc/
+drwxr-xr-x  2 root root 4096 Apr 18  2022 home/
+lrwxrwxrwx  1 root root    7 Sep 20 09:18 lib -> usr/lib/
+lrwxrwxrwx  1 root root    9 Sep 20 09:18 lib32 -> usr/lib32/
+lrwxrwxrwx  1 root root    9 Sep 20 09:18 lib64 -> usr/lib64/
+lrwxrwxrwx  1 root root   10 Sep 20 09:18 libx32 -> usr/libx32/
+drwxr-xr-x  2 root root 4096 Sep 20 09:19 media/
+drwxr-xr-x  2 root root 4096 Sep 20 09:19 mnt/
+drwxr-xr-x  2 root root 4096 Sep 20 09:19 opt/
+drwxr-xr-x  2 root root 4096 Apr 18  2022 proc/
+drwx------  2 root root 4096 Sep 20 09:19 root/
+drwxr-xr-x  8 root root 4096 Sep 20 09:34 run/
+lrwxrwxrwx  1 root root    8 Sep 20 09:18 sbin -> usr/sbin/
+drwxr-xr-x  2 root root 4096 Sep 20 09:19 srv/
+drwxr-xr-x  2 root root 4096 Apr 18  2022 sys/
+drwxrwxrwt  2 root root 4096 Sep 20 09:34 tmp/
+drwxr-xr-x 14 root root 4096 Sep 20 09:19 usr/
+drwxr-xr-x 11 root root 4096 Sep 20 09:19 var/
+__________________________________________________________________________________
+
+systemd-nspawn -D /var/lib/machines/jammy1 --machine jammey1
+systemd-nspawn -D /var/lib/machines/jammy1/ --machine jammy1 -b
+root@dedic-DyvoPes:~# cat /etc/os-release
+PRETTY_NAME="Ubuntu 22.04 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04 (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+
+root@dedic-DyvoPes:~# 
+
+root@dedic-DyvoPes:~# apt update
+Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease
+Get:2 http://archive.ubuntu.com/ubuntu jammy/main Translation-en [510 kB]
+Fetched 510 kB in 1s (366 kB/s)         
+Reading package lists... Done
+Building dependency tree... Done
+All packages are up to date.
+root@dedic-DyvoPes:~# 
+___________________________________________________________________________________
+machinectl start jammy1
+systemctl status systemd-nspawn@jammy1.service
+root@dedic-DyvoPes:~$ systemctl status systemd-nspawn@jammy1.service
+● systemd-nspawn@jammy1.service - Container jammy1
+     Loaded: loaded (/lib/systemd/system/systemd-nspawn@.service; disabled; vendor preset: enabled)
+     Active: active (running) since Fri 2024-09-20 10:09:51 UTC; 1min 18s ago
+       Docs: man:systemd-nspawn(1)
+   Main PID: 52865 (systemd-nspawn)
+     Status: "Container running: Startup finished in 660ms."
+      Tasks: 13 (limit: 16384)
+     Memory: 26.2M
+     CGroup: /machine.slice/systemd-nspawn@jammy1.service
+             ├─payload
+             │ ├─init.scope
+             │ │ └─52871 /usr/lib/systemd/systemd
+             │ └─system.slice
+             │   ├─console-getty.service
+             │   │ └─52939 /sbin/agetty -o -p -- \u --noclear --keep-baud console 115200,38400,9600 vt220
+             │   ├─cron.service
+             │   │ └─52929 /usr/sbin/cron -f -P
+             │   ├─dbus.service
+             │   │ └─52930 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+             │   ├─networkd-dispatcher.service
+             │   │ └─52932 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+             │   ├─rsyslog.service
+             │   │ └─52933 /usr/sbin/rsyslogd -n -iNONE
+             │   ├─systemd-journald.service
+             │   │ └─52891 /lib/systemd/systemd-journald
+             │   ├─systemd-logind.service
+             │   │ └─52934 /lib/systemd/systemd-logind
+
+___________________________________________________________________________________
+
+root@dedic-DyvoPes:~$  machinectl status jammy1
+jammy1(4752db9c09f5400691daecd873ff417a)
+           Since: Fri 2024-09-20 10:09:51 UTC; 3min 4s ago
+          Leader: 52871 (systemd)
+         Service: systemd-nspawn; class container
+            Root: /var/lib/machines/jammy1
+           Iface: ve-jammy1
+              OS: Ubuntu 22.04 LTS
+       UID Shift: 672661504
+            Unit: systemd-nspawn@jammy1.service
+                  ├─payload
+                  │ ├─init.scope
+                  │ │ └─52871 /usr/lib/systemd/systemd
+                  │ └─system.slice
+                  │   ├─console-getty.service
+                  │   │ └─52939 /sbin/agetty -o -p -- \u --noclear --keep-baud console 115200,38400,9600 vt220
+                  │   ├─cron.service
+                  │   │ └─52929 /usr/sbin/cron -f -P
+                  │   ├─dbus.service
+                  │   │ └─52930 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+                  │   ├─networkd-dispatcher.service
+                  │   │ └─52932 /usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers
+                  │   ├─rsyslog.service
+                  │   │ └─52933 /usr/sbin/rsyslogd -n -iNONE
+                  │   ├─systemd-journald.service
+                  │   │ └─52891 /lib/systemd/systemd-journald
+                  │   ├─systemd-logind.service
+                  │   │ └─52934 /lib/systemd/systemd-logind
+
+___________________________________________________________________________________
+root@dedic-DyvoPes:~$ machinectl login jammy1
+Connected to machine jammy1. Press ^] three times within 1s to exit session.
+
+Ubuntu 22.04 LTS dedic-DyvoPes pts/1
+
+dedic-DyvoPes login: root
+Password: 
+Welcome to Ubuntu 22.04 LTS (GNU/Linux 5.4.0-196-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+Last login: Fri Sep 20 10:00:43 UTC 2024 on pts/0
+root@dedic-DyvoPes:~# cat /etc/os-release
+PRETTY_NAME="Ubuntu 22.04 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04 (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+______________________
+
+
+systemctl edit --full --force jammy1.service
+
+[Unit]
+Description=Bullseye Container
+[Service]
+LimitNOFILE=100000
+ExecStart=/usr/bin/systemd-nspawn --machine=jammy1 --directory=/var/lib/machines/jammy1/ -b --network-ipvlan=eth1
+
+Restart=always
+
+[Install]
+Also=dbus.service
+WantedBy=default.target
+
+______________________________________________________
+
++ Both commands inside containers and host OS and my network is perfect
+systemctl enable systemd-networkd.service
+systemctl start systemd-networkd.service
+
+
+
+Bookworm
+root@bookworm1:/# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: host0@if10: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether f2:c7:e2:8b:8e:9a brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.168.2.89/28 metric 1024 brd 192.168.2.95 scope global dynamic host0
+       valid_lft 3353sec preferred_lft 3353sec
+    inet 192.168.97.201/28 metric 1024 brd 192.168.97.207 scope global dynamic host0
+       valid_lft 3598sec preferred_lft 3598sec
+    inet6 fe80::f0c7:e2ff:fe8b:8e9a/64 scope link 
+       valid_lft forever preferred_lft forever
+       
+       
+Jammy root@dedic-DyvoPes:~# ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: host0@if13: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 46:e3:88:dc:83:91 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 192.168.103.30/28 metric 1024 brd 192.168.103.31 scope global dynamic host0
+       valid_lft 3535sec preferred_lft 3535sec
+    inet6 fe80::44e3:88ff:fedc:8391/64 scope link 
+       valid_lft forever preferred_lft forever
+
+
